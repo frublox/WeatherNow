@@ -4,27 +4,38 @@
         version="0.0.1"
         xmlns="http://www.w3.org/ns/widgets"
         xmlns:cdv="http://cordova.apache.org/ns/1.0">
+
     <name>WeatherNow</name>
+
     <description>
         Local weather, forecast
     </description>
+
     <author email="dev@cordova.apache.org" href="http://cordova.io">
         QRC Systems
     </author>
+
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" version="1" />
+
+    <preference name="Orientation" value="portrait" />
+
     <access origin="*" />
+
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="tel:*" />
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+
     <platform name="android">
         <allow-intent href="market:*" />
     </platform>
+
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
+
 </widget>
