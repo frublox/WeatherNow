@@ -1,22 +1,30 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<widget xmlns   = "http://www.w3.org/ns/widgets"
-        xmlns:gap   = "http://phonegap.com/ns/1.0"
-        id          = "com.qrcsystems.weathernow"
-        versionCode = "10"
-        version     = "1.0.0" >
-
-    <!-- versionCode is optional and Android only -->
-
-    <name>Weather Now</name>
-
+<?xml version='1.0' encoding='utf-8'?>
+<widget
+        id="com.qrcsystems.weathernow"
+        version="0.0.1"
+        xmlns="http://www.w3.org/ns/widgets"
+        xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>WeatherNow</name>
     <description>
         Local weather, forecast
     </description>
-
-    <author href="https://build.phonegap.com" email="support@phonegap.com">
+    <author email="dev@cordova.apache.org" href="http://cordova.io">
         QRC Systems
     </author>
-
-    <gap:platform name="android" />
-
+    <content src="index.html" />
+    <plugin name="cordova-plugin-whitelist" version="1" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <platform name="android">
+        <allow-intent href="market:*" />
+    </platform>
+    <platform name="ios">
+        <allow-intent href="itms:*" />
+        <allow-intent href="itms-apps:*" />
+    </platform>
 </widget>
