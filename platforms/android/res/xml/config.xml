@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.qrcsystems.weathernow" version="0.0.1" xmlns="http://www.w3.org/ns/widgets">
+    <preference name="loglevel" value="DEBUG" />
+    <feature name="Whitelist">
+        <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
+        <param name="onload" value="true" />
+    </feature>
+    <allow-intent href="market:*" />
+    <name>WeatherNow</name>
+    <description>
+        Local weather, forecast
+    </description>
+    <author email="dev@cordova.apache.org" href="http://cordova.io">
+        QRC Systems
+    </author>
+    <content src="index.html" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="android-targetSdkVersion" value="16" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+</widget>
