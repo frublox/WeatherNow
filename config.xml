@@ -24,4 +24,5 @@
     <platform name="android">
         <allow-intent href="market:*" />
     </platform>
+
 </widget>
