@@ -29,6 +29,16 @@ var app = {
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
 
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                showAd(position);
+            },
+            function (error) {
+                console.log("Failed to get location: " + error.code + " " + error.message);
+                showAd(null);
+            }
+        );
+
         showAd();
     },
     // Update DOM on a Received Event
@@ -37,20 +47,24 @@ var app = {
     }
 };
 
-function showAd() {
+function showAd(position) {
     var admobid = {        
         banner:         'ca-app-pub-2529384802310422/8448183594',
         interstitial:   'ca-app-pub-2529384802310422/7035169192'
     };
 
+    options = { 
+        adId: admobid.banner, 
+        position: AdMob.AD_POSITION.BOTTOM_CENTER, 
+        autoShow: true
+    };
+
+    if (position !== null) {
+        options.location = [position.coords.latitude, position.coords.longitude];
+    }
+
     if (AdMob) {
-        AdMob.createBanner(
-            { 
-                adId: admobid.banner, 
-                position: AdMob.AD_POSITION.BOTTOM_CENTER, 
-                autoShow: true
-            } 
-        );
+        AdMob.createBanner(options);
     } 
 }
 
