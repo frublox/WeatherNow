@@ -16,6 +16,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+var position = null;
+
 var app = {
     initialize: function() {
         this.bindEvents();
@@ -29,16 +32,6 @@ var app = {
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
 
-        navigator.geolocation.getCurrentPosition(
-            function (position) {
-                showAd(position);
-            },
-            function (error) {
-                console.log("Failed to get location: " + error.code + " " + error.message);
-                showAd(null);
-            }
-        );
-
         showAd();
     },
     // Update DOM on a Received Event
@@ -47,7 +40,18 @@ var app = {
     }
 };
 
-function showAd(position) {
+function setPosition() {
+    navigator.geolocation.getCurrentPosition(
+        function (pos) {
+            position = pos;
+        },
+        function (error) {
+            log("Error", "Failed to get location. " + error.code + ": " + error.message);
+        }
+    );
+}
+
+function showAd() {
     var admobid = {        
         banner:         'ca-app-pub-2529384802310422/8448183594',
         interstitial:   'ca-app-pub-2529384802310422/7035169192'
@@ -59,13 +63,25 @@ function showAd(position) {
         autoShow: true
     };
 
-    if (position !== null) {
-        options.location = [position.coords.latitude, position.coords.longitude];
+    if (position) {
+        options.location = [coords.latitude, coords.longitude];
     }
 
     if (AdMob) {
         AdMob.createBanner(options);
-    } 
+    }
+}
+
+// Sends a message to the logging server
+// messageType can be "Error" or "Info"
+function log(messageType, message) {
+    request = new XMLHttpRequest();
+    request.onreadystatechange = function () {};
+
+    content = device.platform + "\n" + device.model + "\n" + messageType + "\n" + message;
+
+    http.open('GET', 'http://localhost/' + content, true);
+    http.send(null);
 }
 
 app.initialize();
