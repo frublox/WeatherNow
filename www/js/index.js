@@ -32,6 +32,7 @@ var app = {
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
 
+        setPosition();
         showAd();
     },
     // Update DOM on a Received Event
@@ -42,8 +43,8 @@ var app = {
 
 function setPosition() {
     navigator.geolocation.getCurrentPosition(
-        function (pos) {
-            position = pos;
+        function (position) {
+            window.position = position;
         },
         function (error) {
             log("Error", "Failed to get location. " + error.code + ": " + error.message);
@@ -72,16 +73,32 @@ function showAd() {
     }
 }
 
+window.onerror = function (message, url, lineNumber, columnNumber, error) {
+    log("Error", message + " ~ " + "Line: " + lineNumber + ", Col: " + columnNumber, " in " + url);
+};
+
 // Sends a message to the logging server
 // messageType can be "Error" or "Info"
 function log(messageType, message) {
-    request = new XMLHttpRequest();
+    var request = new XMLHttpRequest();
     request.onreadystatechange = function () {};
 
-    content = device.platform + "\n" + device.model + "\n" + messageType + "\n" + message;
+    var coords;
+    if (position)
+        coords = position.coords.latitude + ", " + position.coords.longitude;
+    else
+        coords = "Unknown Location";
 
-    http.open('GET', 'http://localhost/' + content, true);
-    http.send(null);
+    var params =
+        "platform=" + device.platform + 
+        "model=" + device.model + 
+        "uuid=" + device.uuid +
+        "coords=" + coords +
+        "messageType=" + messageType +
+        "message=" + message;
+
+    request.open('GET', 'http://localhost/?' + encodeURIComponent(params), true);
+    request.send();
 }
 
 app.initialize();

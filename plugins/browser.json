@@ -4,7 +4,18 @@
         "uninstalled": []
     },
     "config_munge": {
-        "files": {}
+        "files": {
+            "config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"Device\"><param name=\"browser-package\" value=\"Device\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
     },
     "installed_plugins": {
         "cordova-plugin-whitelist": {
@@ -14,6 +25,9 @@
             "PACKAGE_NAME": "com.qrcsystems.weathernow"
         },
         "cordova-plugin-geolocation": {
+            "PACKAGE_NAME": "com.qrcsystems.weathernow"
+        },
+        "cordova-plugin-device": {
             "PACKAGE_NAME": "com.qrcsystems.weathernow"
         }
     },

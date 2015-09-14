@@ -15,6 +15,10 @@
                         {
                             "xml": "<feature name=\"AdMob\"><param name=\"android-package\" value=\"com.rjfun.cordova.admob.AdMobPlugin\" /><param name=\"onload\" value=\"true\" /></feature>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
+                            "count": 1
                         }
                     ]
                 }
@@ -57,6 +61,9 @@
             "PACKAGE_NAME": "com.qrcsystems.weathernow"
         },
         "cordova-plugin-geolocation": {
+            "PACKAGE_NAME": "com.qrcsystems.weathernow"
+        },
+        "cordova-plugin-device": {
             "PACKAGE_NAME": "com.qrcsystems.weathernow"
         }
     },
