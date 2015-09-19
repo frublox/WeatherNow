@@ -29,7 +29,6 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 	def log_to_db(self, params):
 		ip = self.address_string()
 
-		# expecting coords to be in the form of "latitude, longitude"
 		parsed_coords = map(int, params['coords'].replace(' ', '').split(','))
 
 		latitude = parsed_coords[0]
