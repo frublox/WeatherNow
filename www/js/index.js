@@ -1,104 +1,152 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+/*jshint curly: true, eqeqeq: true, globals: false, es5: false, esnext: true, loopfunc: true, sub: true, browser: true*/
 
-var position = null;
+// A brief implementation of the Maybe monad
+
+function Just(value) {
+	this.value = value;
+}
+
+Just.prototype.bind = f => f(this.value);
+Just.prototype.toString = () => "Just " + this.value;
+
+var Nothing = {
+	bind: () => this,
+	toString: () => "Nothing"
+};
+
+// ---------------------------------------------------------------------------
+
+// These globals are set when onDeviceReady is called to make sure they exist
+var device, AdMob;
 
 var app = {
-    initialize: function() {
-        this.bindEvents();
-    },
+	adConfigs: {
+		banner: {
+			adId: 'ca-app-pub-2529384802310422/8448183594',
+			autoShow: true
+		},
+		interstitial: {
+			adId: 'ca-app-pub-2529384802310422/7035169192',
+			autoShow: false
+		}
+	},
 
-    // Common events are: 'load', 'deviceready', 'offline', and 'online'.
-    bindEvents: function() {
-        document.addEventListener('deviceready', this.onDeviceReady, false);
-    },
+	initialize: function () {
+		this.bindEvents();
+	},
 
-    onDeviceReady: function() {
-        app.receivedEvent('deviceready');
+	bindEvents: function () {
+		document.addEventListener('deviceready', this.onDeviceReady, false);
+		document.addEventListener('resume', this.onResume, false);
+	},
 
-        setPosition();
-        showAd();
-    },
-    // Update DOM on a Received Event
-    receivedEvent: function(id) {
+	onDeviceReady: function () {
+		configureGlobals();
+		configureAdMob();
 
-    }
+		log("Info", "App has started.");
+	},
+
+	onResume: function () {
+		displayAds();
+	}
 };
 
-function setPosition() {
-    navigator.geolocation.getCurrentPosition(
-        function (position) {
-            window.position = position;
-        },
-        function (error) {
-            log("Error", "Failed to get location. " + error.code + ": " + error.message);
-        }
-    );
+function configureGlobals() {
+	device = window.device;
+	AdMob = window.AdMob;
 }
 
-function showAd() {
-    var admobid = {        
-        banner:         'ca-app-pub-2529384802310422/8448183594',
-        interstitial:   'ca-app-pub-2529384802310422/7035169192'
-    };
-
-    options = { 
-        adId: admobid.banner, 
-        position: AdMob.AD_POSITION.BOTTOM_CENTER, 
-        autoShow: true
-    };
-
-    if (position) {
-        options.location = [coords.latitude, coords.longitude];
-    }
-
-    if (AdMob) {
-        AdMob.createBanner(options);
-    }
+function configureAdMob() {
+	if (AdMob) {
+		maybeGetCoords().bind(coords => {
+			app.adConfigs.banner.location = coords;
+			app.adConfigs.interstitial.location = coords;
+		});
+		
+		app.adConfigs.banner.position = AdMob.AD_POSITION.BOTTOM_CENTER;
+		
+		AdMob.prepareInterstitial(app.adConfigs.interstitial);
+	}
 }
 
-window.onerror = function (message, url, lineNumber, columnNumber, error) {
-    log("Error", message + " ~ " + "Line: " + lineNumber + ", Col: " + columnNumber, " in " + url);
-};
+function displayAds() {
+	if (AdMob) {
+		AdMob.isInterstitialReady(isReady => {
+			if (isReady) { 
+				AdMob.showInterstitial(); 
+			}
+		});
+		
+		AdMob.createBanner(app.adConfigs.banner);
+	}
+}
 
-// Sends a message to the logging server
-// messageType can be "Error" or "Info"
 function log(messageType, message) {
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function () {};
-
-    var coords;
-    if (position)
-        coords = position.coords.latitude + ", " + position.coords.longitude;
-    else
-        coords = "Unknown Location";
-
-    var params =
-        "platform=" + device.platform + 
-        "model=" + device.model + 
-        "uuid=" + device.uuid +
-        "coords=" + coords +
-        "messageType=" + messageType +
-        "message=" + message;
-
-    request.open('GET', 'http://localhost/?' + encodeURIComponent(params), true);
-    request.send();
+//	var request = new XMLHttpRequest(),
+//		queryString = createLogQueryString(messageType, message),
+//		url = 'http://localhost:8001/' + queryString;
+	
+//	window.alert(messageType + ": " + message);
+//	request.open('GET', url, true);
+//	request.send();
 }
+
+function createLogQueryString(messageType, message) {
+	var maybeCoords = maybeGetCoords(),
+
+		latitude = maybeCoords.bind(coords => coords[0]),
+		longitude = maybeCoords.bind(coords => coords[1]),
+
+		paramNames = [
+	        "platform=", "model=", "uuid=", "latitude=", 
+	        "longitude=", "messageType=", "message="
+	    ],
+		params = [
+	        device.platform, device.model, device.uuid,
+	        latitude, longitude, messageType, message
+	    ],
+
+	    queryString = "?";
+
+	params.forEach((param, index) => {
+		queryString += paramNames[index] + encodeURIComponent(param);
+	});
+
+	return queryString;
+}
+
+function maybeGetCoords() {
+	return maybeGetPosition().bind(position =>
+		[position.coords.latitude, position.coords.longitude]
+	);
+}
+
+function maybeGetPosition() {
+	var maybePosition;
+
+	navigator.geolocation.getCurrentPosition(
+		position => {
+			maybePosition = new Just(position);
+		},
+		error => {
+			var details = error.code + ": " + error.message,
+				errorMessage = "Failed to get location. " + details;
+			
+			log("Error", errorMessage);
+			
+			maybePosition = Nothing;
+		}
+	);
+
+	return maybePosition;
+}
+
+window.onerror = (message, url, lineNumber, columnNumber) => {
+	var details = "Line: " + lineNumber + ", Col: " + columnNumber + ", Url:" + url,
+		errorMessage = message + " - " + details;
+	
+	log("Error", errorMessage);
+};
 
 app.initialize();

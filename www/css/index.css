@@ -2,15 +2,6 @@ body {
 	margin: 0;
     width: 100%;
 }
-/*.footer {
-    position:fixed;
-    left:0;
-    bottom:0;
-    height:10%;
-    width:100%;
-    background: lightskyblue;
-    text-align: center;
-}*/
 .content {
     width: 100%;
     margin-bottom: auto;
