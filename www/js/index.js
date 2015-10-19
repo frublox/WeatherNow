@@ -75,9 +75,8 @@ function configureAdMob() {
 function displayAds() {
 	if (AdMob) {
 		AdMob.isInterstitialReady(isReady => {
-			if (isReady) { 
+			if (isReady)
 				AdMob.showInterstitial(); 
-			}
 		});
 		
 		AdMob.createBanner(app.adConfigs.banner);
@@ -87,15 +86,15 @@ function displayAds() {
 function log(messageType, message) {
 	$.ajax({
 		method: "POST",
-		url: "http://localhost:8081",
-		data: createLogInfo(messageType, message)
+		url: "http://localhost:3000/log",
+		data: createLogJSON(messageType, message)
 	});
 }
 
-function createLogInfo(messageType, message) {
+function createLogJSON(messageType, message) {
 	var location = maybeGetCoords().bind(coords => coords[0] + ", " + coords[1]);
 	
-	if (location === Nothing) 
+	if (location === Nothing)
 		location = "Unknown";
 		
 	return {
@@ -124,7 +123,7 @@ function maybeGetPosition() {
 		},
 		error => {
 			var details = error.code + ": " + error.message,
-				errorMessage = "Failed to get location. " + details;
+				errorMessage = "Failed to get location - " + details;
 			
 			log("Error", errorMessage);
 			
