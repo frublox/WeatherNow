@@ -20,6 +20,8 @@ var Nothing = {
 var device, AdMob;
 
 var app = {
+	name: "WeatherNow",
+	
 	adConfigs: {
 		banner: {
 			adId: 'ca-app-pub-2529384802310422/8448183594',
@@ -83,37 +85,28 @@ function displayAds() {
 }
 
 function log(messageType, message) {
-//	var request = new XMLHttpRequest(),
-//		queryString = createLogQueryString(messageType, message),
-//		url = 'http://localhost:8001/' + queryString;
-	
-//	window.alert(messageType + ": " + message);
-//	request.open('GET', url, true);
-//	request.send();
+	$.ajax({
+		method: "POST",
+		url: "http://localhost:8081",
+		data: createLogInfo(messageType, message)
+	});
 }
 
-function createLogQueryString(messageType, message) {
-	var maybeCoords = maybeGetCoords(),
-
-		latitude = maybeCoords.bind(coords => coords[0]),
-		longitude = maybeCoords.bind(coords => coords[1]),
-
-		paramNames = [
-	        "platform=", "model=", "uuid=", "latitude=", 
-	        "longitude=", "messageType=", "message="
-	    ],
-		params = [
-	        device.platform, device.model, device.uuid,
-	        latitude, longitude, messageType, message
-	    ],
-
-	    queryString = "?";
-
-	params.forEach((param, index) => {
-		queryString += paramNames[index] + encodeURIComponent(param);
-	});
-
-	return queryString;
+function createLogInfo(messageType, message) {
+	var location = maybeGetCoords().bind(coords => coords[0] + ", " + coords[1]);
+	
+	if (location === Nothing) 
+		location = "Unknown";
+		
+	return {
+		"appId": app.name,
+		"message": message,
+		"messageType": messageType,
+		"location": location,
+		"uuid": device.uuid,
+		"platform": device.platform,
+		"model": device.model
+	};
 }
 
 function maybeGetCoords() {
