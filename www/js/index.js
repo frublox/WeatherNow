@@ -85,17 +85,20 @@ function displayAds() {
 
 function log(messageType, message) {
 	$.ajax({
-		method: "POST",
 		url: "http://localhost:3000/log",
+		method: "POST",
 		data: createLogJSON(messageType, message)
 	});
 }
 
 function createLogJSON(messageType, message) {
-	var location = maybeGetCoords().bind(coords => coords[0] + ", " + coords[1]);
+	var formatCoords = coords => "[" + coords[0] + ", " + coords[1] + "]";
+		location = maybeGetCoords().bind(formatCoords);
 	
 	if (location === Nothing)
 		location = "Unknown";
+	else
+		location = location.value
 		
 	return {
 		"appId": app.name,
